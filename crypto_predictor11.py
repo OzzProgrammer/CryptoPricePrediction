@@ -132,6 +132,8 @@ COINS = {
 
 # --- Data Fetching ---
 @st.cache_data(ttl=3600)
+import time
+
 def fetch_data(coin_id, days):
     """Fetches historical price data from CoinGecko API."""
     url = COIN_GECKO_API_URL.format(coin_id=coin_id, days=days)
@@ -148,6 +150,7 @@ def fetch_data(coin_id, days):
         df['Low'] = df['Price'].rolling(window=2).min()
         df['Close'] = df['Price']
         df.dropna(inplace=True)  # Drop the first row with NaN values
+        time.sleep(0.1) # Add a small delay to respect rate limits. (adjust the delay to align with documented rate limit)
         return df
     except requests.exceptions.RequestException as e:
         st.error(f"Error fetching data: {e}")
@@ -156,7 +159,6 @@ def fetch_data(coin_id, days):
         st.error(f"Error parsing data: {e}")
         return None
 
-@st.cache_data(ttl=3600)
 def fetch_coin_info(coin_id):
     """Fetches coin information (including market cap) from CoinGecko API."""
     url = COIN_GECKO_COIN_URL.format(coin_id=coin_id)
@@ -165,6 +167,7 @@ def fetch_coin_info(coin_id):
         response.raise_for_status()
         data = response.json()
         market_cap = data['market_data']['market_cap']['usd']
+        time.sleep(0.1) # Adjust value if api rate limit is to high
         return market_cap
     except requests.exceptions.RequestException as e:
         st.error(f"Error fetching coin info: {e}")
@@ -172,7 +175,6 @@ def fetch_coin_info(coin_id):
     except (KeyError, ValueError) as e:
         st.error(f"Error parsing coin info: {e}")
         return None
-
 
 @st.cache_data(ttl=3600)
 def fetch_fear_greed_index():
