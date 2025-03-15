@@ -11,6 +11,8 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.model_selection import train_test_split
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
+import time
+
 
 # --- (All your existing functions: fetch_data, ..., plot_data_plotly, etc. remain the SAME) ---
 # Download VADER lexicon
@@ -132,8 +134,6 @@ COINS = {
 
 # --- Data Fetching ---
 @st.cache_data(ttl=3600)
-import time
-
 def fetch_data(coin_id, days):
     """Fetches historical price data from CoinGecko API."""
     url = COIN_GECKO_API_URL.format(coin_id=coin_id, days=days)
